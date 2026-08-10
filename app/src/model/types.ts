@@ -36,6 +36,8 @@ export interface Config {
     complianceOfficer: string; principalOfficer: string
     regType: 'non-individual' | 'individual' | 'unconfirmed'
   }
+  /** The T-15 → T-0 readiness runway that precedes Day 1. */
+  prep: { startDate: string; endDate: string }
   sprint: { startDate: string; days: number }
   target: {
     monthlyRunRate: number          // ₹25,00,000 at Day 60
@@ -203,6 +205,17 @@ export interface Discovery {
   confirmedAt?: string
 }
 
+// ---- Launch readiness (M0) ----
+
+export type GateStatus = 'not_started' | 'in_progress' | 'passed' | 'failed' | 'waived'
+export interface GateState { status: GateStatus; evidence: string; verifiedBy: string; updatedAt: string }
+export interface StepState { done: boolean; doneAt?: string; note?: string; owner?: string }
+export interface Readiness {
+  gates: Record<string, GateState>
+  steps: Record<string, StepState>
+  tripwireBaseline: Record<string, string>
+}
+
 export interface AppData {
   reps: Rep[]
   daily: Record<string, DailyLog>
@@ -222,5 +235,6 @@ export interface AppData {
   scenarios: Scenario[]
   wbr: Record<string, WeeklyReview>
   discovery: Discovery
+  readiness: Readiness
   auditTrail: { at: string; what: string }[]
 }

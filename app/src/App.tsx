@@ -2,10 +2,10 @@ import React, { useMemo, useState } from 'react'
 import {
   Gauge, Sigma, IndianRupee, PhoneCall, Magnet, Megaphone, Users, GraduationCap,
   ShieldCheck, Landmark, PackageCheck, CalendarClock, Bot, ClipboardList, Settings2, CircleHelp,
-  Moon, Sun,
+  Moon, Sun, Rocket,
 } from 'lucide-react'
 import { useStore } from './state/store'
-import { todayISO, inrC, pct } from './lib/format'
+import { todayISO, inrC, pct, diffDays } from './lib/format'
 import { pacing, sprintCal } from './model/engine'
 import { monteCarlo } from './model/monteCarlo'
 import { sGet, sSet } from './lib/storage'
@@ -25,8 +25,10 @@ import M13 from './modules/M13Agents'
 import M14 from './modules/M14WBR'
 import Config from './modules/Config'
 import Discovery from './modules/Discovery'
+import M00 from './modules/M00Readiness'
 
 const NAV: { id: string; label: string; k: string; icon: React.ComponentType<{ size?: number }>; group?: string }[] = [
+  { id: 'm0', label: 'Launch Readiness', k: 'M0', icon: Rocket },
   { id: 'm1', label: 'Command Center', k: 'M1', icon: Gauge },
   { id: 'm2', label: 'Quant Engine', k: 'M2', icon: Sigma },
   { id: 'm3', label: 'Revenue & P&L', k: 'M3', icon: IndianRupee, group: 'Revenue' },
@@ -47,10 +49,12 @@ const NAV: { id: string; label: string; k: string; icon: React.ComponentType<{ s
 
 export default function App() {
   const { cfg, data, theme, setTheme, mode } = useStore()
-  const [view, setView] = useState<string>(() => sGet('view', 'm1'))
+  // During the readiness runway the prep board is the home screen, not the sprint dashboard.
+  const [view, setView] = useState<string>(() => sGet('view', todayISO() <= cfg.prep.endDate ? 'm0' : 'm1'))
   const go = (m: string) => { setView(m); sSet('view', m); window.scrollTo(0, 0) }
 
   const today = todayISO()
+  const inPrep = today <= cfg.prep.endDate
   const cal = useMemo(() => sprintCal(cfg, today), [cfg, today])
   const pace = useMemo(() => pacing(cfg, data, today), [cfg, data, today])
   const mc = useMemo(() => monteCarlo(cfg, data.reps), [cfg, data.reps])
@@ -82,8 +86,12 @@ export default function App() {
       <div className="main">
         <header className="topbar noprint">
           <div className="topstat">
-            <span className="lbl">Day</span>
-            <span className="val">D{cal.dayIndex}<span className="dim">/{cal.days}</span></span>
+            <span className="lbl">{inPrep ? 'Readiness' : 'Day'}</span>
+            <span className="val">
+              {inPrep
+                ? <>T−{Math.max(0, diffDays(today, cfg.prep.endDate))}<span className="dim"> to Day 1</span></>
+                : <>D{cal.dayIndex}<span className="dim">/{cal.days}</span></>}
+            </span>
           </div>
           <div className="topstat">
             <span className="lbl">₹/working day needed</span>
@@ -114,6 +122,7 @@ export default function App() {
         </header>
 
         <main className="content">
+          {view === 'm0' && <M00 />}
           {view === 'm1' && <M01 go={go} />}
           {view === 'm2' && <M02 />}
           {view === 'm3' && <M03 />}

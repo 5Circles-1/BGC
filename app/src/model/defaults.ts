@@ -13,7 +13,10 @@ export const CEO_DEFAULT_CONFIG: Config = {
     principalOfficer: '',                     // Discovery Q3
     regType: 'unconfirmed',
   },
-  sprint: { startDate: '2026-08-11', days: 60 },
+  // T-15 → T-0 readiness runway, then the sprint. Day 1 moved from 11 Aug to 26 Aug
+  // to buy the 15-day preparation window (see docs/PRELAUNCH.md).
+  prep: { startDate: '2026-08-11', endDate: '2026-08-25' },
+  sprint: { startDate: '2026-08-26', days: 60 },
   target: {
     monthlyRunRate: 2500000,
     basis: 'gross',
@@ -111,20 +114,21 @@ export const DEFAULT_DATA: AppData = {
     { id: 'rep_03', name: 'Closer 3 (existing)', desk: 'A', joinDate: '2026-06-01', active: true },
     { id: 'rep_04', name: 'Sr Closer 1 → Desk B', desk: 'B', joinDate: '2026-06-01', active: true },
     { id: 'rep_05', name: 'Sr Closer 2 → Desk B', desk: 'B', joinDate: '2026-06-01', active: true },
-    // Planned cohorts per the 60-day arc — replace with real names as they join.
-    { id: 'rep_c1a', name: 'Cohort 1 — A1 (planned)', desk: 'A', joinDate: '2026-08-19', active: true, planned: true },
-    { id: 'rep_c1b', name: 'Cohort 1 — A2 (planned)', desk: 'A', joinDate: '2026-08-19', active: true, planned: true },
-    { id: 'rep_c1c', name: 'Cohort 1 — A3 (planned)', desk: 'A', joinDate: '2026-08-19', active: true, planned: true },
-    { id: 'rep_c1d', name: 'Cohort 1 — A4 (planned)', desk: 'A', joinDate: '2026-08-19', active: true, planned: true },
-    { id: 'rep_c1e', name: 'Cohort 1 — A5 (planned)', desk: 'A', joinDate: '2026-08-19', active: true, planned: true },
-    { id: 'rep_b1', name: 'Senior hire — B (planned)', desk: 'B', joinDate: '2026-08-25', active: true, planned: true },
-    { id: 'rep_b2', name: 'Senior hire — B (planned)', desk: 'B', joinDate: '2026-08-25', active: true, planned: true },
-    { id: 'rep_c2a', name: 'Cohort 2 — A1 (planned)', desk: 'A', joinDate: '2026-09-01', active: true, planned: true },
-    { id: 'rep_c2b', name: 'Cohort 2 — A2 (planned)', desk: 'A', joinDate: '2026-09-01', active: true, planned: true },
-    { id: 'rep_c2c', name: 'Cohort 2 — A3 (planned)', desk: 'A', joinDate: '2026-09-01', active: true, planned: true },
-    { id: 'rep_c3a', name: 'Cohort 3 — A1 (planned)', desk: 'A', joinDate: '2026-09-15', active: true, planned: true },
-    { id: 'rep_c3b', name: 'Cohort 3 — A2 (planned)', desk: 'A', joinDate: '2026-09-15', active: true, planned: true },
-    { id: 'rep_c3c', name: 'Cohort 3 — A3 (planned)', desk: 'A', joinDate: '2026-09-15', active: true, planned: true },
+    // Planned cohorts. The prep window exists so Cohort 1 is hired, offered and
+    // Academy-ready BEFORE Day 1 — they join on Day 1, not in week 3.
+    { id: 'rep_c1a', name: 'Cohort 1 — A1 (planned)', desk: 'A', joinDate: '2026-08-26', active: true, planned: true },
+    { id: 'rep_c1b', name: 'Cohort 1 — A2 (planned)', desk: 'A', joinDate: '2026-08-26', active: true, planned: true },
+    { id: 'rep_c1c', name: 'Cohort 1 — A3 (planned)', desk: 'A', joinDate: '2026-08-26', active: true, planned: true },
+    { id: 'rep_c1d', name: 'Cohort 1 — A4 (planned)', desk: 'A', joinDate: '2026-08-26', active: true, planned: true },
+    { id: 'rep_c1e', name: 'Cohort 1 — A5 (planned)', desk: 'A', joinDate: '2026-08-26', active: true, planned: true },
+    { id: 'rep_b1', name: 'Senior hire — B1 (planned)', desk: 'B', joinDate: '2026-09-01', active: true, planned: true },
+    { id: 'rep_b2', name: 'Senior hire — B2 (planned)', desk: 'B', joinDate: '2026-09-01', active: true, planned: true },
+    { id: 'rep_c2a', name: 'Cohort 2 — A1 (planned)', desk: 'A', joinDate: '2026-09-09', active: true, planned: true },
+    { id: 'rep_c2b', name: 'Cohort 2 — A2 (planned)', desk: 'A', joinDate: '2026-09-09', active: true, planned: true },
+    { id: 'rep_c2c', name: 'Cohort 2 — A3 (planned)', desk: 'A', joinDate: '2026-09-09', active: true, planned: true },
+    { id: 'rep_c3a', name: 'Cohort 3 — A1 (planned)', desk: 'A', joinDate: '2026-09-23', active: true, planned: true },
+    { id: 'rep_c3b', name: 'Cohort 3 — A2 (planned)', desk: 'A', joinDate: '2026-09-23', active: true, planned: true },
+    { id: 'rep_c3c', name: 'Cohort 3 — A3 (planned)', desk: 'A', joinDate: '2026-09-23', active: true, planned: true },
   ],
   daily: {},
   candidates: [],
@@ -146,6 +150,7 @@ export const DEFAULT_DATA: AppData = {
   scenarios: [],
   wbr: {},
   discovery: { answers: {}, confirmed: false },
+  readiness: { gates: {}, steps: {}, tripwireBaseline: {} },
   auditTrail: [],
 }
 
