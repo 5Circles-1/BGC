@@ -23,7 +23,7 @@ First run: answer **Discovery** (the 16 questions the model needs), then confirm
 ## The calendar
 
 **Prep runway: Tue 11 Aug (T-15) → Tue 25 Aug (T-1, go/no-go 18:00). Sprint Day 1 = Wed 26 Aug 2026. Day 60 = Sat 24 Oct 2026.**
-Open OPERATOR and it lands on **M0 Launch Readiness** until T-0: 36 gates (16 blocking), 119 dated steps, 15 role charters, the tool stack and the offline tripwires.
+Open OPERATOR and it lands on **M0 Launch Readiness** until T-0: 36 gates (16 blocking), 119 dated steps, 14 role charters, the tool stack and the offline tripwires.
 
 **The finding that shapes everything:** ~₹10.25L of the ₹25L monthly mix cannot lawfully launch on Day 1 — the research line has no named analyst, no Compliance Officer and no validation evidence. Either research opens by ~Day 20, or Day 60 re-bases to ₹15–17L with ₹25L at Day 85–95. Read [`docs/PRELAUNCH.md`](docs/PRELAUNCH.md) §1 before anything else.
 

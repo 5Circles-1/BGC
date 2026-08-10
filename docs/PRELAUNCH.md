@@ -4,7 +4,7 @@
 
 Thirteen working days. Sat 15 Aug is Independence Day (banks and registrar shut — internal work only); Sundays 16 and 23 Aug are catch-up days with one reading task each.
 
-The live version of this document is **OPERATOR module M0 — Launch Readiness** (`portal/index.html`), which is the dashboard's home screen until T-0. It carries 36 gates, 119 steps, 15 role charters, 15 tools and 8 offline tripwires, each checkable. This file is the narrative and the reasoning behind them.
+The live version of this document is **OPERATOR module M0 — Launch Readiness** (`portal/index.html`), which is the dashboard's home screen until T-0. It carries 36 gates, 119 steps, 14 role charters, 15 tools and 8 offline tripwires, each checkable. This file is the narrative and the reasoning behind them.
 
 ---
 
