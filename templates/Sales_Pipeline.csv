@@ -1,0 +1,2 @@
+lead_ref,student_name,product,stage,amount_inr,probability_pct,next_action,next_action_date,closer,expected_close_date,notes
+Example Lead,Example Lead,Flagship Course,Follow-up 2,34999,60,Send EMI options,2026-08-14,Closer 1,2026-08-16,Attended webinar; objection = spouse approval

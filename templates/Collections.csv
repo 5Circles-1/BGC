@@ -1,0 +1,2 @@
+date,invoice_no,student_name,product,gross_inr,gst_inr,net_inr,payment_mode,gateway_ref,settlement_status,collected_by
+2026-08-12,5C-2026-0001,Example Student,Flagship Course,34999,5338,29661,Razorpay,pay_XXXX,Settled,Online
