@@ -2,3 +2,6 @@
 node_modules/
 *.log
 scratch/
+
+app/dist/
+app/node_modules/

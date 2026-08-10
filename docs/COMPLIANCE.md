@@ -1,5 +1,7 @@
 # Compliance Guardrails — 5 Circles Private Limited
 
+> **v2 update (10 Aug 2026):** the OPERATOR brief confirms SEBI RA registration **INH000020004** — G0's written confirmation remains the Day-1 task, but the plan now includes research revenue (Scanner Pro, Research Subscription) behind full RA machinery. The live compliance system — fee-cap ledger, KYC/access gates, analyst sign-off queue, ad pre-flight, grievance clocks, AI-use register — is **OPERATOR module M9** (`portal/index.html`), and the standing rules live in the [`sebi-ra-compliance`](../.claude/skills/sebi-ra-compliance/SKILL.md) skill. This document remains as the v1 gate framework; where they differ, the skill + M9 govern.
+
 **Owner: Management + Finance. Status: gate G0 must be cleared before the first rupee of ad spend.**
 
 Compliance is not a brake on the 60-day target — it is what keeps the engine running at Day 30 when volumes are high. An ad account ban or a SEBI notice in Week 4 kills the target outright. Clear these gates once, early, and the rest of the plan runs without interruption.

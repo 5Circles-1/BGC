@@ -1,35 +1,31 @@
 # BGC — 5 Circles Business Growth Center
 
-The operating system for the 60-day sprint to **₹25,00,000 collected revenue** (11 Aug → 9 Oct 2026), interlinking all six departments — Sales, Marketing, HR, Finance, Operations, Management — through one tracking system.
+The operating system for the 60-day sprint to **₹25,00,000/month collections** (11 Aug → 9 Oct 2026) for 5 Circles Private Limited, SEBI-registered Research Analyst (INH000020004 — verify in writing Day 1).
 
-## Start here
+## The instrument: OPERATOR v2
+
+**Open [`portal/index.html`](portal/index.html) in any browser.** One self-contained file — no server, no install, works on the sales-floor phone. Fourteen modules: command center, quant engine (reverse solver / sensitivity / Monte Carlo), sales & lead engines, hiring & academy, compliance vault (fee-cap ledger, KYC gates, analyst sign-off), finance & cash, the daily ritual, the 31-agent console, and the weekly review. Manual: [`docs/OPERATOR.md`](docs/OPERATOR.md).
+
+First run: answer **Discovery** (the 16 questions the model needs), then confirm the restated one-pager. Until then OPERATOR runs on the brief's CEO defaults — every number editable in **Config**.
 
 | # | Read/do | Where |
 |---|---|---|
-| 1 | The master plan: target math, scenarios, week-by-week, checkpoints, recovery playbook | [`ROADMAP.md`](ROADMAP.md) |
-| 2 | Compliance gates — G0 (SEBI) clears **before** the first rupee of ad spend | [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md) |
-| 3 | The tracking system: Master Tracker sheet + Make.com automations + cadence | [`docs/TRACKING-SYSTEM.md`](docs/TRACKING-SYSTEM.md) |
-| 4 | Each department's contract: mission, KPIs, SOPs, SLAs, week-1 checklist | [`docs/departments/`](docs/departments/) |
-| 5 | The daily war-room instrument — open it, set owners, log day 1 | [`portal/index.html`](portal/index.html) |
-| 6 | CSV templates → import into Google Sheets as the "5C Growth Master Tracker" | [`templates/`](templates/) |
+| 1 | **OPERATOR manual** — model in one page, the 14 modules, data rules | [`docs/OPERATOR.md`](docs/OPERATOR.md) |
+| 2 | App source (React/TS; `npm install && npm run build`) | [`app/`](app) |
+| 3 | Claude skills that carry the domain knowledge (compliance, sales playbook, creative pre-flight, war-room ritual, MIS formats) | [`.claude/skills/`](.claude/skills) |
+| 4 | v1 roadmap & department playbooks (webinar-era plan — arithmetic still instructive) | [`ROADMAP.md`](ROADMAP.md), [`docs/departments/`](docs/departments) |
+| 5 | Compliance gates (v1 doc + v2 note; the live machinery is OPERATOR M9) | [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md) |
+| 6 | v1 portal (superseded, kept for reference) | [`portal/legacy-v1.html`](portal/legacy-v1.html) |
+| 7 | CSV templates for the Google-Sheets master tracker (optional alongside OPERATOR) | [`templates/`](templates) |
 
-## The portal (Growth Command Center)
+## Week-1 unblocks (the two dates that decide the sprint)
 
-`portal/index.html` is a single self-contained file — no server, no install. Open it in any browser (laptop or phone). It holds the dashboard (pace vs ₹25L), the live funnel calculator, the 60-day checklist, the department interlock map, the daily war-room log and the blockers board. Data stays in the browser; export a JSON backup after each war room (Data tab).
+1. **Ad accounts verified** — SI-Portal contacts registered; the exact same email/mobile on Meta (SEBI advertiser verification) and Google (India financial-services verification). Separate ad accounts for the education and research brands.
+2. **Cohort 1 hired into the Academy** — 6 joiners by Day 8; the Day-2 SEBI-compliance gate (≥95%) is non-negotiable.
+3. Scanner split shipped: Lite (user-defined screens, education) vs Pro (signals, RA service behind KYC + analyst sign-off).
+4. Speed-to-lead under 5 minutes, on a screen the floor can see.
+5. Fee-cap ledger live before the first research-service invoice (OPERATOR M9).
 
-## Day-1 checklist (from `ROADMAP.md` — the five unblocks)
+## Honest frame
 
-1. Meta ad account: add payment method + business verification + link the Page/IG.
-2. SEBI gate G0: confirm registration status in writing; strip "SEBI-Reg." claims until a number exists; park Stride advisory.
-3. Lock the price book (every batch, BEAT flagship, Membership) — one sheet, no off-book discounts.
-4. Create the Master Tracker from `/templates`; import July's 260+ untouched leads into `Lead_Log`.
-5. Upgrade Make.com off the Free plan; scenarios S1 (speed-to-lead) and S2 (cash telegraph) go live this week.
-
-## Departments, in one line each
-
-- **Marketing** feeds the machine (leads at CPL ≤ plan) → [`marketing.md`](docs/departments/marketing.md)
-- **Sales** converts (speed-to-lead ≤ 5 min, disposition on every call) → [`sales.md`](docs/departments/sales.md)
-- **Finance** keeps every rupee visible and clean (gateway-only online) → [`finance.md`](docs/departments/finance.md)
-- **Operations** delivers and manufactures proof (show rate, NPS, testimonials) → [`operations.md`](docs/departments/operations.md)
-- **HR** staffs ahead of the curve (triggers, 7-day TAT) → [`hr.md`](docs/departments/hr.md)
-- **Management** owns the number (cadence, gates, kill/scale) → [`management.md`](docs/departments/management.md)
+From a ≈₹5L base with 5 closers, ₹25L by Day 60 is the ~25–30% case; ₹16–18L is P50, and ₹25L by Day 85–95 is the ~75% case. **The plan is identical either way — only the date on the wall changes.** A team that fakes the date usually mis-sold to get there; in a regulated business that trade is never worth it. The live probability, recomputed from actuals, is on the Command Center.
