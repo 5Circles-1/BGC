@@ -98,7 +98,7 @@ function Payroll() {
         cols={[
           { h: 'Rep', render: (r: typeof rows[number]) => <span><strong>{r.rep.name}</strong> <span className="faint small">({r.rep.desk})</span></span>, csv: r => r.rep.name },
           { h: 'Fixed', num: true, render: r => inr(r.fixed), csv: r => r.fixed },
-          { h: 'P1 units', num: true, render: r => (r.rep.desk === 'A' ? num(r.p1Units) : '—'), csv: r => r.p1Units },
+          { h: 'Anchor units', num: true, render: r => (r.rep.desk === 'A' ? num(r.p1Units) : '—'), csv: r => r.p1Units },
           { h: 'Scanner-yr units', num: true, render: r => (r.rep.desk === 'A' ? num(r.scannerAnnualUnits, 1) : '—'), csv: r => r.scannerAnnualUnits },
           { h: 'B collections', num: true, render: r => (r.rep.desk === 'B' ? inr(Math.round(r.bCollections)) : '—'), csv: r => Math.round(r.bCollections) },
           { h: 'Incentive', num: true, render: r => inr(Math.round(r.incentive)), csv: r => Math.round(r.incentive) },

@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import { useStore } from '../state/store'
 import { Panel, Stat, DataTable, Pill, Num, Text, Select, Modal, Progress } from '../components/ui'
 import { inr, inrC, num, pct, todayISO, uid, addDays, isSunday } from '../lib/format'
-import { rampPct, sprintCal } from '../model/engine'
+import { anchorName, rampPct, sprintCal } from '../model/engine'
 import type { Rep } from '../model/types'
 
 export default function M04() {
@@ -86,10 +86,10 @@ export default function M04() {
       <Panel span={6} title="Desk A — the maths of one ramped closer">
         <div className="kv">
           <dt>Dials/day</dt><dd>{cfg.desks.A.dialsPerDayRamped} (month 1: {cfg.desks.A.dialsPerDayM1})</dd>
-          <dt>P1 sales/day</dt><dd>{cfg.desks.A.p1PerDayRamped} (month 1: {cfg.desks.A.p1PerDayM1})</dd>
-          <dt>P1 sales/month</dt><dd>{Math.round(cfg.desks.A.p1PerDayRamped * cfg.target.workingDaysPerMonth)}</dd>
+          <dt>{anchorName(cfg)} sales/day</dt><dd>{cfg.desks.A.p1PerDayRamped} (month 1: {cfg.desks.A.p1PerDayM1})</dd>
+          <dt>{anchorName(cfg)} sales/month</dt><dd>{Math.round(cfg.desks.A.p1PerDayRamped * cfg.target.workingDaysPerMonth)}</dd>
           <dt>Revenue/month</dt><dd>≈ {inrC(cfg.desks.A.p1PerDayRamped * cfg.target.workingDaysPerMonth * 2124 + 25 * 400)}</dd>
-          <dt>Comp</dt><dd>{inr(cfg.comp.deskAFixed)} + ₹{cfg.comp.deskAPerP1}/P1 + ₹{cfg.comp.deskAPerScannerAnnual}/scanner-yr</dd>
+          <dt>Comp</dt><dd>{inr(cfg.comp.deskAFixed)} + ₹{cfg.comp.deskAPerP1}/sale + ₹{cfg.comp.deskAPerScannerAnnual}/scanner-yr</dd>
         </div>
       </Panel>
       <Panel span={6} title="Desk B — the maths of one value closer">

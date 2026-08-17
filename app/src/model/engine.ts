@@ -56,6 +56,12 @@ export function blendedAovP1(cfg: Config): number {
   return (anchor?.priceInclGst ?? 0) + (bump ? bump.priceInclGst * cfg.funnel.bumpTakeRate : 0)
 }
 
+/** What the floor calls the anchor. Every screen says this instead of a code. */
+export function anchorName(cfg: Config): string {
+  const a = anchorProduct(cfg)
+  return (a?.short || a?.name || '').trim() || 'the anchor product'
+}
+
 /** The product the funnel is solved against. Falls back to the biggest Desk A line. */
 export function anchorProduct(cfg: Config) {
   return cfg.products.find(p => p.id === cfg.anchorProductId)
@@ -314,7 +320,7 @@ export function sensitivity(cfg: Config, reps: Rep[]): { base: Forecast; rows: S
   const levers: SensRow[] = (
     [
       ['Close rate', 'closeMult'], ['CPL (cost per lead)', 'cplMult'],
-      ['AOV (P1 blended)', 'aovMult'], ['Ramp speed', 'rampMult'],
+      ['AOV (anchor blended)', 'aovMult'], ['Ramp speed', 'rampMult'],
     ] as [string, SensRow['kind']][]
   ).map(([lever, kind]) => ({
     lever, kind,

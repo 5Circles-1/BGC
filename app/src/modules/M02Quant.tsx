@@ -3,7 +3,7 @@ import { useStore } from '../state/store'
 import { Panel, Stat, Tabs, Num, DataTable, Pill, Text, useFlash, type Col } from '../components/ui'
 import { McHistogram, SeriesBars } from '../components/charts'
 import { inr, inrC, num, pct, uid } from '../lib/format'
-import { blendedAovP1, forecastSprint, netLeadToSale, planRevenueMonthly, sensitivity, solveFunnel } from '../model/engine'
+import { anchorName, blendedAovP1, forecastSprint, netLeadToSale, planRevenueMonthly, sensitivity, solveFunnel } from '../model/engine'
 import { monteCarlo } from '../model/monteCarlo'
 import type { Scenario } from '../model/types'
 
@@ -62,7 +62,7 @@ function Solver() {
           <Num label="Paid lead share" value={f.paidLeadShare} step={0.05} onChange={v => setCfg(c => ({ ...c, funnel: { ...c.funnel, paidLeadShare: v } }))} />
           <Num label="Bump take rate" value={f.bumpTakeRate} step={0.05} onChange={v => setCfg(c => ({ ...c, funnel: { ...c.funnel, bumpTakeRate: v } }))} />
         </div>
-        <p className="small dim">Blended P1 AOV {inr(blendedAovP1(cfg))} · plan mix held constant at {inrC(plan.total)}/mo (Desk A {inrC(plan.deskA)} · Desk B {inrC(plan.deskB)}). Lifting net lead→sale from {pct(netLeadToSale(cfg), 2)} to 4.5% cuts the lead bill by ≈ {inrC(Math.max(0, (s.leadsMonthly - (s.p1Units / 0.045)) * f.paidLeadShare * f.cplBlended))}/month.</p>
+        <p className="small dim">Blended {anchorName(cfg)} AOV {inr(blendedAovP1(cfg))} · plan mix held constant at {inrC(plan.total)}/mo (Desk A {inrC(plan.deskA)} · Desk B {inrC(plan.deskB)}). Lifting net lead→sale from {pct(netLeadToSale(cfg), 2)} to 4.5% cuts the lead bill by ≈ {inrC(Math.max(0, (s.leadsMonthly - (s.p1Units / 0.045)) * f.paidLeadShare * f.cplBlended))}/month.</p>
       </div>
       <div className="c12">
         <DataTable cols={cols} rows={rows} csvName="solver_mix"
@@ -148,15 +148,15 @@ function WeeklyTable() {
           { h: 'Week', render: (r: typeof rows[number]) => `W${r.week}`, csv: r => r.week },
           { h: 'Spend', num: true, render: r => inrC(r.spend), csv: r => Math.round(r.spend) },
           { h: 'Leads', num: true, render: r => num(r.leads, 0), csv: r => Math.round(r.leads) },
-          { h: 'P1 demand', num: true, render: r => num(r.p1Demand, 0), csv: r => Math.round(r.p1Demand) },
-          { h: 'P1 capacity', num: true, render: r => num(r.p1Capacity, 0), csv: r => Math.round(r.p1Capacity) },
-          { h: 'P1 sales', num: true, render: r => <strong>{num(r.p1Sales, 0)}</strong>, csv: r => Math.round(r.p1Sales) },
+          { h: 'Demand', num: true, render: r => num(r.p1Demand, 0), csv: r => Math.round(r.p1Demand) },
+          { h: 'Capacity', num: true, render: r => num(r.p1Capacity, 0), csv: r => Math.round(r.p1Capacity) },
+          { h: 'Sales', num: true, render: r => <strong>{num(r.p1Sales, 0)}</strong>, csv: r => Math.round(r.p1Sales) },
           { h: 'Revenue', num: true, render: r => inrC(r.revenue), csv: r => Math.round(r.revenue) },
           { h: 'Run-rate', num: true, render: r => inrC(r.runRate), csv: r => Math.round(r.runRate) },
         ]}
         rows={rows}
       />
-      <p className="small dim" style={{ margin: '6px 0 0' }}>Sales = min(demand from leads, floor capacity). Where capacity binds, more spend is wasted; where demand binds, more hiring is wasted. The binding side is the week's true constraint.</p>
+      <p className="small dim" style={{ margin: '6px 0 0' }}>Demand, capacity and sales are counted in {anchorName(cfg)} units. Sales = min(demand from leads, floor capacity). Where capacity binds, more spend is wasted; where demand binds, more hiring is wasted. The binding side is the week's true constraint.</p>
     </>
   )
 }

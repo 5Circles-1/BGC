@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Download } from 'lucide-react'
 import { downloadCSV } from '../lib/csv'
 
@@ -73,14 +73,50 @@ function plain(n: React.ReactNode): string {
   return ''
 }
 
+/** Typing must never wait on the model. Inputs hold their own text and commit on
+ *  blur, Enter, or after a short pause — so one edit costs one recompute instead
+ *  of one per keystroke. Without this, a Monte Carlo run fires on every character
+ *  and the field appears to freeze and swallow what you typed. */
+function useBuffered(external: string, commit: (v: string) => void, delay = 450) {
+  const [local, setLocal] = useState(external)
+  const focused = useRef(false)
+  const timer = useRef<number | undefined>(undefined)
+  const latest = useRef(commit)
+  latest.current = commit
+
+  useEffect(() => { if (!focused.current) setLocal(external) }, [external])
+  useEffect(() => () => window.clearTimeout(timer.current), [])
+
+  const flush = (v: string) => { window.clearTimeout(timer.current); latest.current(v) }
+  return {
+    value: local,
+    onChange: (v: string) => {
+      setLocal(v)
+      window.clearTimeout(timer.current)
+      timer.current = window.setTimeout(() => latest.current(v), delay)
+    },
+    onFocus: () => { focused.current = true },
+    onBlur: () => { focused.current = false; flush(local) },
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') { flush(local); (e.target as HTMLElement).blur() }
+      if (e.key === 'Escape') { window.clearTimeout(timer.current); setLocal(external); focused.current = false; (e.target as HTMLElement).blur() }
+    },
+  }
+}
+
 export function Num({ label, value, onChange, step = 1, suffix, width }: {
   label?: string; value: number; onChange: (v: number) => void; step?: number; suffix?: string; width?: number
 }) {
+  const b = useBuffered(
+    Number.isFinite(value) ? String(+value.toFixed(6)) : '0',
+    v => onChange(v.trim() === '' ? 0 : (parseFloat(v) || 0)),
+  )
   return (
     <label className="field" style={width ? { flex: `0 0 ${width}px` } : undefined}>
       {label && <span className="lbl">{label}{suffix ? ` (${suffix})` : ''}</span>}
-      <input className="in mono" type="number" value={Number.isFinite(value) ? +value.toFixed(6) : 0} step={step}
-        onChange={e => onChange(parseFloat(e.target.value) || 0)} />
+      <input className="in mono" type="number" step={step}
+        value={b.value} onChange={e => b.onChange(e.target.value)}
+        onFocus={b.onFocus} onBlur={b.onBlur} onKeyDown={b.onKeyDown} />
     </label>
   )
 }
@@ -88,12 +124,16 @@ export function Num({ label, value, onChange, step = 1, suffix, width }: {
 export function Text({ label, value, onChange, placeholder, area }: {
   label?: string; value: string; onChange: (v: string) => void; placeholder?: string; area?: boolean
 }) {
+  const b = useBuffered(value, onChange)
+  const common = {
+    className: 'in', value: b.value, placeholder,
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => b.onChange(e.target.value),
+    onFocus: b.onFocus, onBlur: b.onBlur,
+  }
   return (
     <label className="field">
       {label && <span className="lbl">{label}</span>}
-      {area
-        ? <textarea className="in" value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)} />
-        : <input className="in" value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)} />}
+      {area ? <textarea {...common} /> : <input {...common} onKeyDown={b.onKeyDown} />}
     </label>
   )
 }

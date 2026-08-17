@@ -29,7 +29,31 @@ export interface McResult {
   targetEff: number
 }
 
+// A full run is ~8,000 simulated sprints and several components ask for it in the
+// same render. Two things keep that off the typing path: the result is cached
+// against a signature of the inputs, and the signature ignores free text. So
+// renaming a product costs nothing, and changing a price costs exactly one run
+// no matter how many panels display it.
+const COSMETIC = new Set([
+  'name', 'short', 'note', 'notes', 'label', 'legalName', 'brand', 'sebiReg', 'cin',
+  'registeredOffice', 'corporateOffice', 'complianceOfficer', 'principalOfficer', 'role',
+])
+
+export function mcSignature(cfg: Config, reps: Rep[], seed: number): string {
+  return JSON.stringify([seed, cfg, reps], (k, v) => (COSMETIC.has(k) ? 0 : v))
+}
+
+let cache: { key: string; result: McResult } | null = null
+
 export function monteCarlo(cfg: Config, reps: Rep[], seed = 20260811): McResult {
+  const key = mcSignature(cfg, reps, seed)
+  if (cache && cache.key === key) return cache.result
+  const result = runMonteCarlo(cfg, reps, seed)
+  cache = { key, result }
+  return result
+}
+
+function runMonteCarlo(cfg: Config, reps: Rep[], seed: number): McResult {
   const rng = mulberry32(seed)
   const n = Math.max(500, Math.min(20000, cfg.mc.runs))
   const day60: number[] = new Array(n)

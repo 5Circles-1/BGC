@@ -28,8 +28,40 @@ function mergeDeep<T>(base: T, patch: unknown): T {
   return out as T
 }
 
+/** Saved configs are older than the code that reads them. mergeDeep replaces arrays
+ *  wholesale, so a products array stored before a field existed comes back missing it —
+ *  which is how every product started reading "deferred". Repair on the way in, and
+ *  on every write, so a config can never be half-shaped. */
+function normalizeConfig(c: Config): Config {
+  const products = (Array.isArray(c.products) ? c.products : CEO_DEFAULT_CONFIG.products).map((p, i) => {
+    const name = (p.name ?? p.short ?? '').trim() || `Product ${i + 1}`
+    return {
+      ...p,
+      id: p.id || `prod${i + 1}`,
+      name,
+      short: (p.short ?? '').trim() || name,
+      priceInclGst: Number.isFinite(p.priceInclGst) ? p.priceInclGst : 0,
+      unitsPlanMonthly: Number.isFinite(p.unitsPlanMonthly) ? p.unitsPlanMonthly : 0,
+      desk: p.desk === 'B' ? 'B' as const : 'A' as const,
+      regClass: p.regClass ?? 'education',
+      countsTowardCap: p.countsTowardCap ?? p.regClass === 'research',
+      termMonths: Number.isFinite(p.termMonths) ? p.termMonths : 0,
+      // Absent means the field predates this save, not that the product is deferred.
+      shipsDay1: typeof p.shipsDay1 === 'boolean' ? p.shipsDay1 : true,
+    }
+  })
+  const has = (id: string) => products.some(p => p.id === id)
+  const firstA = products.find(p => p.desk === 'A') ?? products[0]
+  return {
+    ...c,
+    products,
+    anchorProductId: has(c.anchorProductId) ? c.anchorProductId : (firstA?.id ?? ''),
+    bumpProductId: has(c.bumpProductId) ? c.bumpProductId : '',
+  }
+}
+
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const [cfg, setCfgState] = useState<Config>(() => mergeDeep(CEO_DEFAULT_CONFIG, sGet<Partial<Config> | null>('config', null)))
+  const [cfg, setCfgState] = useState<Config>(() => normalizeConfig(mergeDeep(CEO_DEFAULT_CONFIG, sGet<Partial<Config> | null>('config', null))))
   const [data, setDataState] = useState<AppData>(() => mergeDeep(DEFAULT_DATA, sGet<Partial<AppData> | null>('data', null)))
   const [theme, setThemeState] = useState<ThemeName>(() => resolveTheme(sGet<string | null>('theme', null)))
 
@@ -49,7 +81,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<StoreCtx>(() => ({
     cfg, data,
-    setCfg: fn => setCfgState(c => fn(c)),
+    setCfg: fn => setCfgState(c => normalizeConfig(fn(c))),
     setData: fn => setDataState(d => fn(d)),
     resetConfig: () => setCfgState(CEO_DEFAULT_CONFIG),
     theme, tokens: THEMES[theme],

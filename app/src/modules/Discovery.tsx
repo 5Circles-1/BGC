@@ -4,7 +4,7 @@ import { useStore } from '../state/store'
 import { Panel, Stat, Text, Pill, Progress } from '../components/ui'
 import { inrC, num, pct } from '../lib/format'
 import { DISCOVERY_QS } from '../model/content'
-import { blendedAovP1, netLeadToSale, planRevenueMonthly, solveFunnel } from '../model/engine'
+import { anchorName, blendedAovP1, netLeadToSale, planRevenueMonthly, solveFunnel } from '../model/engine'
 import { monteCarlo } from '../model/monteCarlo'
 
 export default function Discovery() {
@@ -93,7 +93,7 @@ function OnePager() {
           </p>
           <div className="lbl" style={{ marginTop: 8 }}>The funnel, solved backwards</div>
           <p className="small mono" style={{ margin: 0 }}>
-            {inrC(cfg.target.monthlyRunRate)} → {num(solved.p1Units, 0)} P1 sales → {num(solved.leadsMonthly, 0)} leads/mo ({num(solved.leadsDaily, 0)}/day) @ net {pct(netLeadToSale(cfg), 2)} → spend {inrC(solved.adSpendMonthly)}/mo @ CPL ₹{cfg.funnel.cplBlended} · AOV {inrC(blendedAovP1(cfg))} · closers {Math.ceil(solved.closersA)}A+{Math.ceil(solved.closersB)}B
+            {inrC(cfg.target.monthlyRunRate)} → {num(solved.p1Units, 0)} {anchorName(cfg)} sales → {num(solved.leadsMonthly, 0)} leads/mo ({num(solved.leadsDaily, 0)}/day) @ net {pct(netLeadToSale(cfg), 2)} → spend {inrC(solved.adSpendMonthly)}/mo @ CPL ₹{cfg.funnel.cplBlended} · AOV {inrC(blendedAovP1(cfg))} · closers {Math.ceil(solved.closersA)}A+{Math.ceil(solved.closersB)}B
           </p>
           <div className="lbl" style={{ marginTop: 8 }}>Sequence</div>
           <p className="small" style={{ margin: 0 }}>

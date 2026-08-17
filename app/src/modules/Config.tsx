@@ -4,7 +4,7 @@ import { useStore } from '../state/store'
 import { Panel, Num, Text, Select, DataTable, useFlash, Pill, Stat } from '../components/ui'
 import { inr, inrC, uid } from '../lib/format'
 import { exportAll, importAll, wipeAll, downloadFile } from '../lib/storage'
-import { planRevenueMonthly } from '../model/engine'
+import { anchorName, planRevenueMonthly } from '../model/engine'
 import { FIRST_PULL, applyFeed, feedTotals, type FeedSnapshot } from '../model/feed'
 
 export default function Config() {
@@ -178,7 +178,7 @@ export default function Config() {
       <Panel span={6} title="Desks, ramp & comp">
         <div className="formrow">
           <Num label="A dials/day (ramped)" value={cfg.desks.A.dialsPerDayRamped} onChange={v => setCfg(c => ({ ...c, desks: { ...c.desks, A: { ...c.desks.A, dialsPerDayRamped: v } } }))} />
-          <Num label="A P1 sales/day (ramped)" value={cfg.desks.A.p1PerDayRamped} step={0.1} onChange={v => setCfg(c => ({ ...c, desks: { ...c.desks, A: { ...c.desks.A, p1PerDayRamped: v } } }))} />
+          <Num label={`A ${anchorName(cfg)} sales/day (ramped)`} value={cfg.desks.A.p1PerDayRamped} step={0.1} onChange={v => setCfg(c => ({ ...c, desks: { ...c.desks, A: { ...c.desks.A, p1PerDayRamped: v } } }))} />
           <Num label="B revenue/mo ₹" value={cfg.desks.B.revenuePerMonth} step={10000} onChange={v => setCfg(c => ({ ...c, desks: { ...c.desks, B: { ...c.desks.B, revenuePerMonth: v } } }))} />
         </div>
         <div className="lbl" style={{ margin: '10px 0 4px' }}>Ramp curve — % of full output by week since join</div>
