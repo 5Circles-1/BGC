@@ -263,7 +263,9 @@ function LiveData() {
   const importPasted = () => {
     try {
       const snap = JSON.parse(paste) as FeedSnapshot
-      if (!snap.ads || !snap.campaigns) { setFlash('Not a feed snapshot — needs "ads" and "campaigns" arrays.'); return }
+      if (!Array.isArray(snap?.ads) || !Array.isArray(snap?.campaigns) || !Array.isArray(snap?.accounts) || typeof snap?.pulledAt !== 'string') {
+        setFlash('Not a feed snapshot — needs "pulledAt" plus "accounts", "campaigns" and "ads" arrays.'); return
+      }
       load(snap); setPaste('')
     } catch { setFlash('Could not parse that as JSON.') }
   }

@@ -9,6 +9,7 @@ import { todayISO, inrC, pct, diffDays } from './lib/format'
 import { pacing, sprintCal } from './model/engine'
 import { monteCarlo } from './model/monteCarlo'
 import { sGet, sSet } from './lib/storage'
+import { Guard } from './components/Guard'
 import M01 from './modules/M01Command'
 import M02 from './modules/M02Quant'
 import M03 from './modules/M03Revenue'
@@ -55,10 +56,19 @@ const NAV: { id: string; label: string; k: string; icon: React.ComponentType<{ s
   { id: 'config', label: 'Config', k: '⚙', icon: Settings2 },
 ]
 
+/** Test hook: set bos:__crashscreen to a view id and that screen throws on render,
+ *  proving the recovery card works. Never set outside scripts/test-armor.mjs. */
+const CRASH_SCREEN = sGet('__crashscreen', '')
+function CrashProbe(): React.ReactElement { throw new Error('Deliberate crash-test (bos:__crashscreen) — delete the key to clear.') }
+
 export default function App() {
   const { cfg, data, theme, setTheme, mode } = useStore()
   // During the readiness runway the prep board is the home screen, not the sprint dashboard.
-  const [view, setView] = useState<string>(() => sGet('view', 'm20'))
+  // A saved view from an older build may name a screen that no longer exists — fall home.
+  const [view, setView] = useState<string>(() => {
+    const v = sGet<unknown>('view', 'm20')
+    return typeof v === 'string' && NAV.some(n => n.id === v) ? v : 'm20'
+  })
   const go = (m: string) => { setView(m); sSet('view', m); window.scrollTo(0, 0) }
 
   const today = todayISO()
@@ -130,6 +140,8 @@ export default function App() {
         </header>
 
         <main className="content">
+          <Guard level="screen" resetKey={view} onHome={() => { setView('m20'); window.scrollTo(0, 0) }}>
+          {view === CRASH_SCREEN && <CrashProbe />}
           {view === 'm20' && <M20 go={go} />}
           {view === 'm21' && <M21 />}
           {view === 'm22' && <M22 />}
@@ -151,6 +163,7 @@ export default function App() {
           {view === 'm14' && <M14 />}
           {view === 'discovery' && <Discovery />}
           {view === 'config' && <Config />}
+          </Guard>
         </main>
       </div>
     </div>

@@ -162,6 +162,7 @@ export function applyFeed(data: AppData, feed: FeedSnapshot): { data: AppData; r
   let leads = 0, spend = 0
   const days = new Set<string>()
   for (const row of feed.daily) {
+    if (!row || typeof row.date !== 'string') continue
     const base: DailyLog = daily[row.date] ?? {
       date: row.date, units: {}, collections: {}, leadsIn: 0, leadsBySource: {}, spend: {},
       dials: 0, connects: 0, quals: 0, speedToLeadMedianMin: null, reps: {}, notes: {}, eod: {}, locked: false,
