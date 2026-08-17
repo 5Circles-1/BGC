@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import {
   Gauge, Sigma, IndianRupee, PhoneCall, Magnet, Megaphone, Users, GraduationCap,
   ShieldCheck, Landmark, PackageCheck, CalendarClock, Bot, ClipboardList, Settings2, CircleHelp,
-  Moon, Sun, Rocket, Sunrise,
+  Moon, Sun, Rocket, Sunrise, Command, Network, CalendarCheck,
 } from 'lucide-react'
 import { useStore } from './state/store'
 import { todayISO, inrC, pct, diffDays } from './lib/format'
@@ -27,10 +27,16 @@ import Config from './modules/Config'
 import Discovery from './modules/Discovery'
 import M00 from './modules/M00Readiness'
 import M15 from './modules/M15Brief'
+import M20 from './modules/M20Cockpit'
+import M21 from './modules/M21Departments'
+import M22 from './modules/M22Meetings'
 
 const NAV: { id: string; label: string; k: string; icon: React.ComponentType<{ size?: number }>; group?: string }[] = [
+  { id: 'm20', label: 'The Business', k: 'HOME', icon: Command, group: 'Founder' },
   { id: 'm15', label: 'Morning Brief', k: '08:45', icon: Sunrise },
-  { id: 'm0', label: 'Launch Readiness', k: 'M0', icon: Rocket },
+  { id: 'm21', label: 'Departments', k: 'ALL', icon: Network },
+  { id: 'm22', label: 'Meetings', k: 'LOG', icon: CalendarCheck },
+  { id: 'm0', label: 'Launch Readiness', k: 'M0', icon: Rocket, group: 'Plan' },
   { id: 'm1', label: 'Command Center', k: 'M1', icon: Gauge },
   { id: 'm2', label: 'Quant Engine', k: 'M2', icon: Sigma },
   { id: 'm3', label: 'Revenue & P&L', k: 'M3', icon: IndianRupee, group: 'Revenue' },
@@ -52,7 +58,7 @@ const NAV: { id: string; label: string; k: string; icon: React.ComponentType<{ s
 export default function App() {
   const { cfg, data, theme, setTheme, mode } = useStore()
   // During the readiness runway the prep board is the home screen, not the sprint dashboard.
-  const [view, setView] = useState<string>(() => sGet('view', todayISO() <= cfg.prep.endDate ? 'm0' : 'm1'))
+  const [view, setView] = useState<string>(() => sGet('view', 'm20'))
   const go = (m: string) => { setView(m); sSet('view', m); window.scrollTo(0, 0) }
 
   const today = todayISO()
@@ -124,6 +130,9 @@ export default function App() {
         </header>
 
         <main className="content">
+          {view === 'm20' && <M20 go={go} />}
+          {view === 'm21' && <M21 />}
+          {view === 'm22' && <M22 />}
           {view === 'm15' && <M15 />}
           {view === 'm0' && <M00 />}
           {view === 'm1' && <M01 go={go} />}

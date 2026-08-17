@@ -151,6 +151,16 @@ export const DEFAULT_DATA: AppData = {
   wbr: {},
   discovery: { answers: {}, confirmed: false },
   readiness: { gates: {}, steps: {}, tripwireBaseline: {} },
+  initiatives: [
+    { id: 'ini_01', title: 'Open the research line (Scanner Pro + Research Subscription)', dept: 'research', stage: 'evaluating', impactInrMonthly: 800000, effortDays: 30, owner: 'Harsh + Founder', decisionFrom: 'founder', rationale: 'Roughly a third of the ₹25L plan. Blocked on a named analyst, a named Compliance Officer, back-test evidence and the algo-framework answer — none of which compress into the runway.', createdAt: '2026-08-10', movedAt: '2026-08-10' },
+    { id: 'ini_02', title: 'Scanner Lite as a Desk A attach on the P1 call', dept: 'product', stage: 'building', impactInrMonthly: 440000, effortDays: 10, owner: 'Contract engineer + Harsh', decisionFrom: 'owner', rationale: 'End-of-day screener on user-defined conditions only. Clean education classification, zero onboarding friction, closes on the same call as the course.', createdAt: '2026-08-10', movedAt: '2026-08-10' },
+    { id: 'ini_03', title: 'Work the 179 live leads sitting untouched', dept: 'sales', stage: 'approved', impactInrMonthly: 120000, effortDays: 3, owner: 'Sales Head', decisionFrom: 'owner', rationale: 'Already paid for at ₹7.10 each. July generated 260+ leads and worked none of them; this is the same failure forming again.', createdAt: '2026-08-10', movedAt: '2026-08-10' },
+    { id: 'ini_04', title: 'Move the NIFTY Instagram boost to a lead-form objective', dept: 'marketing', stage: 'idea', impactInrMonthly: 60000, effortDays: 1, owner: 'Media buyer', decisionFrom: 'head', rationale: '₹533 spent on LINK_CLICKS produces clicks no closer can work. Same creative, lead objective, measurable CPL.', createdAt: '2026-08-10', movedAt: '2026-08-10' },
+    { id: 'ini_05', title: 'City workshops beyond Kanpur (Lucknow, Varanasi)', dept: 'operations', stage: 'parked', impactInrMonthly: 250000, effortDays: 20, owner: 'Ops lead', decisionFrom: 'founder', rationale: 'Venue contracting, travel and founder calendar unsolved. A cancelled workshop with paid seats is a refund, reputation and gateway-dispute event at once. Decide at Day 30 on real demand.', createdAt: '2026-08-10', movedAt: '2026-08-10' },
+    { id: 'ini_06', title: 'Gateway payments pushed into the dashboard via Make', dept: 'finance', stage: 'idea', impactInrMonthly: 0, effortDays: 3, owner: 'Abhishek', decisionFrom: 'owner', rationale: 'Collections are the last big manual number. Wiring payment.captured removes the nightly typing that kills adoption.', createdAt: '2026-08-10', movedAt: '2026-08-10' },
+    { id: 'ini_07', title: 'Second face trained so the funnel is not one person', dept: 'hr', stage: 'idea', impactInrMonthly: 0, effortDays: 25, owner: 'Founder', decisionFrom: 'founder', rationale: 'Rahul is the face, the teacher, the closer and the war-room chair. A week of illness stops the company. Train a second host by week 5.', createdAt: '2026-08-10', movedAt: '2026-08-10' },
+  ],
+  meetings: [],
   auditTrail: [],
 }
 

@@ -240,5 +240,9 @@ export interface AppData {
   readiness: Readiness
   /** Latest imported live-data snapshot (see model/feed.ts). */
   feed?: import('./feed').FeedSnapshot
+  /** Ideas and initiatives being discussed, per department. */
+  initiatives: import('./org').Initiative[]
+  /** The meetings the business is actually run in. */
+  meetings: import('./org').Meeting[]
   auditTrail: { at: string; what: string }[]
 }
