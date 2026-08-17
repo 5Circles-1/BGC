@@ -13,7 +13,7 @@ export default function M06() {
   const today = todayISO()
 
   const cal = sprintCal(cfg, today)
-  const spendSprint = useMemo(() => Object.values(data.daily).filter(l => l.date >= cal.start && l.date <= cal.end).reduce((s, l) => s + Object.values(l.spend).reduce((a, v) => a + (v || 0), 0), 0), [data.daily, cal])
+  const spendSprint = useMemo(() => Object.values(data.daily).filter(l => l.date >= cal.start && l.date <= cal.end).reduce((s, l) => s + Object.values(l.spend).reduce<number>((a, v) => a + (v || 0), 0), 0), [data.daily, cal])
   const week = sprintWeekOf(cfg, cal.today)
   const tranche = cfg.spendRampMonthly.find(t => week <= t.uptoWeek) ?? cfg.spendRampMonthly.at(-1)!
 

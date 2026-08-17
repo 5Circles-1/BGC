@@ -100,7 +100,7 @@ function EodForm({ log, upd, submitFn, locked }: { log: DailyLog; upd: (p: Parti
                 <td className="num">{numIn(log.collections[p.id] ?? null, v => upd({ collections: { ...log.collections, [p.id]: v } }), 96)}</td>
               </tr>
             ))}
-            <tr className="sum"><td>Total</td><td className="num">{num(Object.values(log.units).reduce((s, v) => s + (v || 0), 0))}</td><td className="num">{inr(Math.round(collectionsOf(log)))}</td></tr>
+            <tr className="sum"><td>Total</td><td className="num">{num(Object.values(log.units).reduce<number>((s, v) => s + (v || 0), 0))}</td><td className="num">{inr(Math.round(collectionsOf(log)))}</td></tr>
           </tbody>
         </table></div>
         <div className="row" style={{ marginTop: 8, gap: 8 }}>
@@ -121,11 +121,11 @@ function EodForm({ log, upd, submitFn, locked }: { log: DailyLog; upd: (p: Parti
             {cfg.channels.map(ch => (
               <tr key={ch.id}>
                 <td>{ch.name.split(' (')[0]}</td>
-                <td className="num">{numIn(log.leadsBySource[ch.id] ?? null, v => upd({ leadsBySource: { ...log.leadsBySource, [ch.id]: v }, leadsIn: Object.entries({ ...log.leadsBySource, [ch.id]: v }).reduce((s, [, x]) => s + (x || 0), 0) }), 64)}</td>
+                <td className="num">{numIn(log.leadsBySource[ch.id] ?? null, v => upd({ leadsBySource: { ...log.leadsBySource, [ch.id]: v }, leadsIn: Object.entries({ ...log.leadsBySource, [ch.id]: v }).reduce<number>((s, [, x]) => s + (x || 0), 0) }), 64)}</td>
                 <td className="num">{ch.paid ? numIn(log.spend[ch.id] ?? null, v => upd({ spend: { ...log.spend, [ch.id]: v } }), 90) : <span className="faint">—</span>}</td>
               </tr>
             ))}
-            <tr className="sum"><td>Total</td><td className="num">{num(Object.values(log.leadsBySource).reduce((s, v) => s + (v || 0), 0))}</td><td className="num">{inr(Math.round(Object.values(log.spend).reduce((s, v) => s + (v || 0), 0)))}</td></tr>
+            <tr className="sum"><td>Total</td><td className="num">{num(Object.values(log.leadsBySource).reduce<number>((s, v) => s + (v || 0), 0))}</td><td className="num">{inr(Math.round(Object.values(log.spend).reduce<number>((s, v) => s + (v || 0), 0)))}</td></tr>
           </tbody>
         </table></div>
         <button className="btn sm noprint" style={{ marginTop: 8 }} onClick={() => submitFn('marketing')} disabled={locked}><CheckCircle2 size={13} /> Submit Marketing EOD</button>

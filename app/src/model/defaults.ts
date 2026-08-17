@@ -27,6 +27,8 @@ export const CEO_DEFAULT_CONFIG: Config = {
     // with Month-1 ≈ ₹9–10L, matching Appendix C of the plan.
     runRatePlanWeekly: [500000, 700000, 900000, 1100000, 1350000, 1600000, 1900000, 2200000, 2500000],
   },
+  anchorProductId: 'p1',
+  bumpProductId: 'p1b',
   funnel: {
     connectRate: 0.55,
     qualRate: 0.45,
@@ -37,14 +39,14 @@ export const CEO_DEFAULT_CONFIG: Config = {
     bumpTakeRate: 0.25,
   },
   products: [
-    { id: 'p1', name: 'Market Foundation Course', short: 'P1 Course', priceInclGst: 1999, unitsPlanMonthly: 380, desk: 'A', regClass: 'education', countsTowardCap: false, termMonths: 0, note: 'Single-call phone close, no webinar' },
-    { id: 'p1b', name: 'Sector Playbook Pack (order bump)', short: 'P1b Bump', priceInclGst: 499, unitsPlanMonthly: 95, desk: 'A', regClass: 'education', countsTowardCap: false, termMonths: 0 },
-    { id: 'p2a', name: 'Scanner Lite — monthly', short: 'Lite /mo', priceInclGst: 499, unitsPlanMonthly: 180, desk: 'A', regClass: 'saas', countsTowardCap: false, termMonths: 1, note: 'User-defined conditions only. No recommendations.' },
-    { id: 'p2b', name: 'Scanner Lite — annual', short: 'Lite /yr', priceInclGst: 4999, unitsPlanMonthly: 70, desk: 'A', regClass: 'saas', countsTowardCap: false, termMonths: 12 },
-    { id: 'p2c', name: 'Scanner Pro — signal engine', short: 'Pro /yr', priceInclGst: 14999, unitsPlanMonthly: 20, desk: 'B', regClass: 'research', countsTowardCap: true, termMonths: 12, note: 'RA service. KYC + agreement + risk profile before access; analyst sign-off on every batch.' },
-    { id: 'p3', name: 'Research Subscription', short: 'Research', priceInclGst: 24999, unitsPlanMonthly: 20, desk: 'B', regClass: 'research', countsTowardCap: true, termMonths: 12, note: 'Positional calls with written rationale. Full RA compliance.' },
-    { id: 'p4a', name: 'City Workshop (one day)', short: 'Workshop', priceInclGst: 9999, unitsPlanMonthly: 25, desk: 'B', regClass: 'education', countsTowardCap: false, termMonths: 0 },
-    { id: 'p4b', name: 'Mentorship Cohort (12 weeks)', short: 'Mentorship', priceInclGst: 74999, unitsPlanMonthly: 3, desk: 'B', regClass: 'education', countsTowardCap: false, termMonths: 3, note: 'Invite-only, existing buyers only, senior closers' },
+    { id: 'p1', name: 'Market Foundation Course', short: 'Foundation Course', priceInclGst: 1999, unitsPlanMonthly: 380, desk: 'A', regClass: 'education', countsTowardCap: false, termMonths: 0, shipsDay1: true, note: 'Single-call phone close, no webinar' },
+    { id: 'p1b', name: 'Sector Playbook Pack (order bump)', short: 'Playbook Pack (add-on)', priceInclGst: 499, unitsPlanMonthly: 95, desk: 'A', regClass: 'education', countsTowardCap: false, termMonths: 0, shipsDay1: true },
+    { id: 'p2a', name: 'Scanner Lite — monthly', short: 'Scanner Lite — monthly', priceInclGst: 499, unitsPlanMonthly: 180, desk: 'A', regClass: 'saas', countsTowardCap: false, termMonths: 1, shipsDay1: true, note: 'User-defined conditions only. No recommendations.' },
+    { id: 'p2b', name: 'Scanner Lite — annual', short: 'Scanner Lite — annual', priceInclGst: 4999, unitsPlanMonthly: 70, desk: 'A', regClass: 'saas', countsTowardCap: false, termMonths: 12, shipsDay1: true },
+    { id: 'p2c', name: 'Scanner Pro — signal engine', short: 'Scanner Pro', priceInclGst: 14999, unitsPlanMonthly: 20, desk: 'B', regClass: 'research', countsTowardCap: true, termMonths: 12, shipsDay1: false, note: 'RA service. KYC + agreement + risk profile before access; analyst sign-off on every batch.' },
+    { id: 'p3', name: 'Research Subscription', short: 'Research Subscription', priceInclGst: 24999, unitsPlanMonthly: 20, desk: 'B', regClass: 'research', countsTowardCap: true, termMonths: 12, shipsDay1: false, note: 'Positional calls with written rationale. Full RA compliance.' },
+    { id: 'p4a', name: 'City Workshop (one day)', short: 'City Workshop', priceInclGst: 9999, unitsPlanMonthly: 25, desk: 'B', regClass: 'education', countsTowardCap: false, termMonths: 0, shipsDay1: true },
+    { id: 'p4b', name: 'Mentorship Cohort (12 weeks)', short: 'Mentorship Cohort', priceInclGst: 74999, unitsPlanMonthly: 3, desk: 'B', regClass: 'education', countsTowardCap: false, termMonths: 3, shipsDay1: false, note: 'Invite-only, existing buyers only, senior closers' },
   ],
   desks: {
     A: { dialsPerDayRamped: 100, dialsPerDayM1: 70, p1PerDayRamped: 3.2, p1PerDayM1: 1.4 },

@@ -1,7 +1,8 @@
 // The OPERATOR data model. Config is the editable "model"; collections are the
 // operating records. Everything persists via lib/storage under bos:* keys.
 
-export type ProductId = 'p1' | 'p1b' | 'p2a' | 'p2b' | 'p2c' | 'p3' | 'p4a' | 'p4b'
+/** Free-form so the ladder can carry the firm's own product names. */
+export type ProductId = string
 export type Desk = 'A' | 'B'
 export type RegClass = 'education' | 'saas' | 'research'
 export type Fn = 'sales' | 'marketing' | 'hr' | 'operations' | 'finance' | 'compliance' | 'research' | 'management'
@@ -16,6 +17,8 @@ export interface Product {
   regClass: RegClass
   countsTowardCap: boolean   // ₹1,51,000/family/yr — research services only
   termMonths: number         // service period for pro-rata refunds (0 = one-time)
+  /** Sellable on Day 1? Anything false is deferred and shows as such everywhere. */
+  shipsDay1: boolean
   note?: string
 }
 
@@ -46,6 +49,9 @@ export interface Config {
     workingDaysPerMonth: number     // 26 (Mon–Sat)
     runRatePlanWeekly: number[]     // planned monthly run-rate at each sprint week (the pacing spine)
   }
+  /** The product the acquisition funnel is solved against, and its checkout bump. */
+  anchorProductId: string
+  bumpProductId: string
   funnel: {
     connectRate: number; qualRate: number; closeRate: number
     cplBlended: number; paidLeadShare: number

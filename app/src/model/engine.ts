@@ -49,10 +49,18 @@ export function planRevenueMonthly(cfg: Config): { total: number; deskA: number;
   return { total: deskA + deskB, deskA, deskB, byProduct }
 }
 
+/** Blended value of one anchor sale, including its checkout add-on at take rate. */
 export function blendedAovP1(cfg: Config): number {
-  const p1 = cfg.products.find(p => p.id === 'p1')!
-  const bump = cfg.products.find(p => p.id === 'p1b')!
-  return p1.priceInclGst + bump.priceInclGst * cfg.funnel.bumpTakeRate
+  const anchor = anchorProduct(cfg)
+  const bump = cfg.products.find(p => p.id === cfg.bumpProductId)
+  return (anchor?.priceInclGst ?? 0) + (bump ? bump.priceInclGst * cfg.funnel.bumpTakeRate : 0)
+}
+
+/** The product the funnel is solved against. Falls back to the biggest Desk A line. */
+export function anchorProduct(cfg: Config) {
+  return cfg.products.find(p => p.id === cfg.anchorProductId)
+    ?? [...cfg.products].filter(p => p.desk === 'A').sort((a, b) => b.unitsPlanMonthly - a.unitsPlanMonthly)[0]
+    ?? cfg.products[0]
 }
 
 export function netLeadToSale(cfg: Config): number {
@@ -84,7 +92,7 @@ export function solveFunnel(cfg: Config, targetMonthly: number, overrides?: { cl
   const close = overrides?.closeRate ?? f.closeRate
   const net = f.connectRate * f.qualRate * close
   const aovAdj = overrides?.aov ? overrides.aov / blendedAovP1(cfg) : 1
-  const p1Units = unitsMonthly['p1'] / aovAdj
+  const p1Units = (unitsMonthly[anchorProduct(cfg).id] ?? 0) / aovAdj
   const leadsMonthly = net > 0 ? p1Units / net : Infinity
   const paidLeads = leadsMonthly * f.paidLeadShare
   const cpl = overrides?.cpl ?? f.cplBlended
@@ -175,11 +183,11 @@ export function forecastSprint(cfg: Config, reps: Rep[], opts: ForecastOpts = {}
   const totalWeeks = Math.ceil(cfg.sprint.days / 7)
   const net = netLeadToSale(cfg) * o.closeMult
   const aov = blendedAovP1(cfg) * o.aovMult
-  const scanPerP1 = {
-    p2a: ratioToP1(cfg, 'p2a'), p2b: ratioToP1(cfg, 'p2b'),
-  }
-  const p2a = cfg.products.find(p => p.id === 'p2a')!
-  const p2b = cfg.products.find(p => p.id === 'p2b')!
+  // Everything else Desk A sells rides along with the anchor at its planned ratio,
+  // so adding or renaming an attach product needs no code change.
+  const anchorId = anchorProduct(cfg).id
+  const attachA = cfg.products.filter(p => p.desk === 'A' && p.id !== anchorId && p.id !== cfg.bumpProductId)
+    .map(p => ({ price: p.priceInclGst, ratio: ratioToP1(cfg, p.id) }))
 
   const weeks: WeekRow[] = []
   let cumP1 = 0
@@ -205,8 +213,7 @@ export function forecastSprint(cfg: Config, reps: Rep[], opts: ForecastOpts = {}
     const p1Sales = Math.min(p1Demand, p1Capacity)
 
     const revenueA = p1Sales * aov
-      + p1Sales * scanPerP1.p2a * p2a.priceInclGst
-      + p1Sales * scanPerP1.p2b * p2b.priceInclGst
+      + attachA.reduce((sum, a) => sum + p1Sales * a.ratio * a.price, 0)
 
     // Desk B works the warm pool: buyers aged 30–90 days (≈ trailing weeks 5–13) + the pre-sprint base
     const pool = EXISTING_WARM_POOL + p1History.slice(-13, -4).reduce((s, x) => s + x, 0)
@@ -230,9 +237,9 @@ export function forecastSprint(cfg: Config, reps: Rep[], opts: ForecastOpts = {}
 }
 
 function ratioToP1(cfg: Config, id: string): number {
-  const p1 = cfg.products.find(p => p.id === 'p1')!
-  const p = cfg.products.find(x => x.id === id)!
-  return p1.unitsPlanMonthly > 0 ? p.unitsPlanMonthly / p1.unitsPlanMonthly : 0
+  const anchor = anchorProduct(cfg)
+  const p = cfg.products.find(x => x.id === id)
+  return anchor && anchor.unitsPlanMonthly > 0 && p ? p.unitsPlanMonthly / anchor.unitsPlanMonthly : 0
 }
 
 // ---------- Pacing ----------
@@ -262,7 +269,7 @@ export function requiredCumAt(cfg: Config, dateISO: string): number {
 
 export function collectionsOf(log: DailyLog | undefined): number {
   if (!log) return 0
-  return Object.values(log.collections).reduce((s, v) => s + (v || 0), 0)
+  return Object.values(log.collections).reduce<number>((s, v) => s + (v || 0), 0)
 }
 
 export function pacing(cfg: Config, data: AppData, todayISO: string): Pacing {
@@ -388,7 +395,8 @@ export function payrollForMonth(cfg: Config, data: AppData, monthPrefix: string)
       if (rep.desk === 'A') {
         p1 += rd.sales
         const totalUnits = Object.entries(d.units).reduce((s, [, v]) => s + (v || 0), 0)
-        const p2bU = d.units['p2b'] || 0
+        const annualSaasIds = cfg.products.filter(p => p.regClass === 'saas' && p.termMonths >= 12).map(p => p.id)
+        const p2bU = annualSaasIds.reduce<number>((a, id) => a + (d.units[id] || 0), 0)
         // attribute desk-level scanner annuals pro-rata to sellers by their share of sales
         const daySales = Object.values(d.reps).reduce((s, x) => s + x.sales, 0)
         if (daySales > 0 && totalUnits > 0) scanAnnual += p2bU * (rd.sales / daySales)
@@ -407,8 +415,8 @@ export function payrollForMonth(cfg: Config, data: AppData, monthPrefix: string)
         const p = cfg.products.find(p => p.id === r.productId)
         if (!p) return s
         if (rep.desk === 'B') return s + r.amount * cfg.comp.deskBPctP3P4
-        if (p.id === 'p1') return s + cfg.comp.deskAPerP1
-        if (p.id === 'p2b') return s + cfg.comp.deskAPerScannerAnnual
+        if (p.id === cfg.anchorProductId) return s + cfg.comp.deskAPerP1
+        if (p.regClass === 'saas' && p.termMonths >= 12) return s + cfg.comp.deskAPerScannerAnnual
         return s
       }, 0)
     rows.push({ rep, fixed, p1Units: p1, scannerAnnualUnits: Math.round(scanAnnual * 10) / 10, bCollections: bColl, incentive, clawback, total: fixed + incentive - clawback })
@@ -434,7 +442,7 @@ export function cashProjection(cfg: Config, data: AppData, todayISO: string): { 
     const wk = fc.weeks[w - 1]
     const inflow = isPast ? collectionsOf(data.daily[d]) : wk.revenue / wk.days
     const spendPlanned = wk.spend / wk.days
-    const spendActual = isPast ? Object.values(data.daily[d]?.spend ?? {}).reduce((s, v) => s + (v || 0), 0) : spendPlanned
+    const spendActual = isPast ? Object.values(data.daily[d]?.spend ?? {}).reduce<number>((s, v) => s + (v || 0), 0) : spendPlanned
     const outflow = spendActual + fixedMonthlyExMarketing / 30.4
     cash += inflow - outflow
     minCash = Math.min(minCash, cash)
@@ -476,7 +484,7 @@ export function dayVariance(cfg: Config, data: AppData, date: string): VarianceL
   push('Dials', `${Math.round(solved.dialsDaily)}`, `${log?.dials ?? 0}`, (log?.dials ?? 0) >= solved.dialsDaily * 0.85)
   const stl = log?.speedToLeadMedianMin
   push('Speed-to-lead (median)', `≤ ${cfg.funnel.speedToLeadTargetMin} min`, stl == null ? '—' : `${stl} min`, stl != null && stl <= cfg.funnel.speedToLeadTargetMin)
-  const spend = Object.values(log?.spend ?? {}).reduce((s, v) => s + (v || 0), 0)
+  const spend = Object.values(log?.spend ?? {}).reduce<number>((s, v) => s + (v || 0), 0)
   const tranche = cfg.spendRampMonthly.find(t => w <= t.uptoWeek) ?? cfg.spendRampMonthly[cfg.spendRampMonthly.length - 1]
   const spendPlan = tranche.monthly / cfg.target.workingDaysPerMonth
   push('Ad spend', `₹${Math.round(spendPlan).toLocaleString('en-IN')}`, `₹${Math.round(spend).toLocaleString('en-IN')}`, spend <= spendPlan * 1.25)

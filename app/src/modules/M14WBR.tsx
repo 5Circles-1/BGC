@@ -27,9 +27,9 @@ export default function M14() {
       if (!l) continue
       coll += collectionsOf(l)
       leads += l.leadsIn
-      spend += Object.values(l.spend).reduce((s, v) => s + (v || 0), 0)
+      spend += Object.values(l.spend).reduce<number>((s, v) => s + (v || 0), 0)
       dials += l.dials
-      sales += Object.values(l.units).reduce((s, v) => s + (v || 0), 0)
+      sales += Object.values(l.units).reduce<number>((s, v) => s + (v || 0), 0)
     }
     const planRun = cfg.target.runRatePlanWeekly[Math.min(w, cfg.target.runRatePlanWeekly.length) - 1]
     const planColl = planRun / cfg.target.workingDaysPerMonth * workDays

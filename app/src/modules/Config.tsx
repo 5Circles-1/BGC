@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import { Download, Upload, RotateCcw, Trash2 } from 'lucide-react'
 import { useStore } from '../state/store'
 import { Panel, Num, Text, Select, DataTable, useFlash, Pill, Stat } from '../components/ui'
-import { inr, inrC } from '../lib/format'
+import { inr, inrC, uid } from '../lib/format'
 import { exportAll, importAll, wipeAll, downloadFile } from '../lib/storage'
 import { planRevenueMonthly } from '../model/engine'
 import { FIRST_PULL, applyFeed, feedTotals, type FeedSnapshot } from '../model/feed'
@@ -13,6 +13,29 @@ export default function Config() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [confirmWipe, setConfirmWipe] = useState(false)
   const plan = planRevenueMonthly(cfg)
+
+  const setProduct = (id: string, patch: Partial<(typeof cfg.products)[number]>) =>
+    setCfg(c => ({ ...c, products: c.products.map(p => (p.id === id ? { ...p, ...patch } : p)) }))
+  const addProduct = () =>
+    setCfg(c => ({
+      ...c,
+      products: [...c.products, {
+        id: uid('prod'), name: 'New product', short: 'New product', priceInclGst: 0, unitsPlanMonthly: 0,
+        desk: 'A' as const, regClass: 'education' as const, countsTowardCap: false, termMonths: 0, shipsDay1: true,
+      }],
+    }))
+  const removeProduct = (id: string) => {
+    if (cfg.products.length <= 1) { setFlash('Keep at least one product — the funnel is solved against it.'); return }
+    setCfg(c => {
+      const products = c.products.filter(p => p.id !== id)
+      return {
+        ...c, products,
+        anchorProductId: c.anchorProductId === id ? (products.find(p => p.desk === 'A') ?? products[0]).id : c.anchorProductId,
+        bumpProductId: c.bumpProductId === id ? '' : c.bumpProductId,
+      }
+    })
+    setFlash('Product removed. Any daily logs already recorded against it are kept.')
+  }
 
   const doExport = async () => {
     const r = await downloadFile(`operator-backup-${new Date().toISOString().slice(0, 10)}.json`, exportAll())
@@ -101,34 +124,55 @@ export default function Config() {
         <p className="small dim" style={{ margin: '6px 0 0' }}>W1 = today's honest base. Last week = the target. The burn-up line integrates this plan over working days.</p>
       </Panel>
 
-      <Panel span={12} title={`Product ladder — plan mix totals ${inrC(plan.total)}/mo (A ${inrC(plan.deskA)} · B ${inrC(plan.deskB)})`}>
-        <DataTable
-          csvName="product_config"
-          cols={[
-            { h: 'Product', render: (p: typeof cfg.products[number]) => <span><strong>{p.short}</strong><span className="small faint" style={{ display: 'block' }}>{p.name}</span></span>, csv: p => p.name },
-            { h: 'Class', render: p => <Pill kind={p.regClass === 'research' ? 'acc' : 'plain'}>{p.regClass}</Pill>, csv: p => p.regClass },
-            { h: 'Desk', render: p => p.desk, csv: p => p.desk },
-            {
-              h: 'Price incl. GST', num: true, render: p => (
-                <span style={{ display: 'inline-block', width: 104 }}>
-                  <Num value={p.priceInclGst} step={100} onChange={v => setCfg(c => ({ ...c, products: c.products.map(x => x.id === p.id ? { ...x, priceInclGst: v } : x) }))} />
-                </span>
-              ), csv: p => p.priceInclGst,
-            },
-            {
-              h: 'Units/mo plan', num: true, render: p => (
-                <span style={{ display: 'inline-block', width: 88 }}>
-                  <Num value={p.unitsPlanMonthly} onChange={v => setCfg(c => ({ ...c, products: c.products.map(x => x.id === p.id ? { ...x, unitsPlanMonthly: v } : x) }))} />
-                </span>
-              ), csv: p => p.unitsPlanMonthly,
-            },
-            { h: 'Revenue/mo', num: true, render: p => inrC(p.priceInclGst * p.unitsPlanMonthly), csv: p => p.priceInclGst * p.unitsPlanMonthly },
-            { h: 'Term', num: true, render: p => p.termMonths ? `${p.termMonths}m` : 'one-time', csv: p => p.termMonths },
-            { h: 'Fee cap', render: p => p.countsTowardCap ? <Pill kind="warn">counts</Pill> : <span className="faint small">outside</span>, csv: p => p.countsTowardCap ? 'counts' : 'outside' },
-          ]}
-          rows={cfg.products}
-        />
-        <p className="small dim" style={{ margin: '8px 0 0' }}>The Lite/Pro split is deliberate: user-defined conditions = tool (education brand, no cap); entry/SL/target signals = research service (RA entity, cap, KYC, sign-off). If the user sets the condition it is a tool; if you set it and tell them to act, it is research.</p>
+      <Panel span={12} title={`Your products — ${cfg.products.length} on the ladder, ${inrC(plan.total)}/mo at plan (Desk A ${inrC(plan.deskA)} · Desk B ${inrC(plan.deskB)})`}
+        right={<button className="btn primary sm noprint" onClick={addProduct}>+ Add a product</button>}>
+        <p className="small dim" style={{ margin: '0 0 8px' }}>
+          Type your own names — Traders Discovery Programme, Grow, Grow+, CTC, whatever the floor actually says on the phone. Every screen in the tool uses these names.
+        </p>
+        <div className="twrap">
+          <table className="t">
+            <thead>
+              <tr>
+                <th style={{ minWidth: 200 }}>Product name</th>
+                <th>Type</th><th>Desk</th>
+                <th className="num">Price ₹</th><th className="num">Units/mo</th><th className="num">Revenue/mo</th>
+                <th>Day 1?</th><th>Fee cap</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {cfg.products.map(p => (
+                <tr key={p.id}>
+                  <td>
+                    <Text value={p.short} onChange={v => setProduct(p.id, { short: v, name: v })} placeholder="e.g. Traders Discovery Programme" />
+                    {cfg.anchorProductId === p.id && <span className="small" style={{ color: 'var(--accent)' }}>★ the product the funnel is solved against</span>}
+                  </td>
+                  <td><Select value={p.regClass} onChange={v => setProduct(p.id, { regClass: v as typeof p.regClass, countsTowardCap: v === 'research' })}
+                    options={[['education', 'Education'], ['saas', 'Tool / SaaS'], ['research', 'Research (RA)']]} /></td>
+                  <td><Select value={p.desk} onChange={v => setProduct(p.id, { desk: v as 'A' | 'B' })} options={[['A', 'A — new'], ['B', 'B — existing']]} /></td>
+                  <td className="num"><span style={{ display: 'inline-block', width: 96 }}><Num value={p.priceInclGst} step={100} onChange={v => setProduct(p.id, { priceInclGst: v })} /></span></td>
+                  <td className="num"><span style={{ display: 'inline-block', width: 80 }}><Num value={p.unitsPlanMonthly} onChange={v => setProduct(p.id, { unitsPlanMonthly: v })} /></span></td>
+                  <td className="num"><strong>{inrC(p.priceInclGst * p.unitsPlanMonthly)}</strong></td>
+                  <td><label className="check"><input type="checkbox" checked={p.shipsDay1} onChange={e => setProduct(p.id, { shipsDay1: e.target.checked })} /> {p.shipsDay1 ? 'ships' : <span style={{ color: 'var(--s-serious)' }}>deferred</span>}</label></td>
+                  <td>{p.countsTowardCap ? <Pill kind="warn">counts</Pill> : <span className="faint small">outside</span>}</td>
+                  <td className="noprint">
+                    <span className="row" style={{ gap: 4 }}>
+                      {cfg.anchorProductId !== p.id && p.desk === 'A' && <button className="btn sm" title="Make this the product the funnel is solved against" onClick={() => setCfg(c => ({ ...c, anchorProductId: p.id }))}>★</button>}
+                      <button className="btn sm danger" onClick={() => removeProduct(p.id)}>Delete</button>
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              <tr className="sum">
+                <td>Total</td><td /><td /><td /><td className="num">{cfg.products.reduce((s, p) => s + p.unitsPlanMonthly, 0)}</td>
+                <td className="num">{inrC(plan.total)}</td>
+                <td className="num">{cfg.products.filter(p => p.shipsDay1).length} of {cfg.products.length}</td><td /><td />
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="small dim" style={{ margin: '8px 0 0' }}>
+          <strong>Type</strong> decides the compliance treatment, not the name: anything marked <em>Research (RA)</em> counts against the ₹1,51,000 family cap and needs KYC, an agreement, a risk profile and analyst sign-off before access. <strong>Day 1?</strong> unticked means the product is deferred — it stays off the price list and its revenue is shown as not shipping. <strong>★</strong> marks the anchor: the one product the lead funnel is solved against.
+        </p>
       </Panel>
 
       <Panel span={6} title="Desks, ramp & comp">

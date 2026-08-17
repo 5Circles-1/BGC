@@ -171,7 +171,7 @@ export function applyFeed(data: AppData, feed: FeedSnapshot): { data: AppData; r
     daily[row.date] = {
       ...base,
       leadsBySource,
-      leadsIn: Object.values(leadsBySource).reduce((s, v) => s + (v || 0), 0),
+      leadsIn: Object.values(leadsBySource).reduce<number>((s, v) => s + (v || 0), 0),
       spend: { ...base.spend, [row.channelId]: row.spend },
     }
     days.add(row.date); leads += row.leads; spend += row.spend

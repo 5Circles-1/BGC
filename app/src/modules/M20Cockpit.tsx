@@ -29,7 +29,7 @@ export default function M20({ go }: { go: (m: string) => void }) {
   const done = useMemo(() => {
     const logs = Object.values(data.daily)
     const total = logs.reduce((s, l) => s + collectionsOf(l), 0)
-    const units = logs.reduce((s, l) => s + Object.values(l.units).reduce((a, v) => a + (v || 0), 0), 0)
+    const units = logs.reduce((s, l) => s + Object.values(l.units).reduce<number>((a, v) => a + (v || 0), 0), 0)
     const month = todayISO().slice(0, 7)
     const thisMonth = logs.filter(l => l.date.startsWith(month)).reduce((s, l) => s + collectionsOf(l), 0)
     const last14 = [] as { d: string; v: number }[]

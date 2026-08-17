@@ -186,14 +186,14 @@ export function departmentStatus(cfg: Config, data: AppData, today: string): Dep
   // ---- Product
   {
     const g = gateHealth('product')
-    const deferred = ['p2c', 'p3', 'p4b']
+    const deferredProducts = cfg.products.filter(p => !p.shipsDay1)
     const sig: DeptSignal[] = [
       { label: 'Acceptance gates', value: `${g.total - g.open}/${g.total}`, health: g.h, detail: 'A SKU without a passed gate does not go on the price list.' },
-      { label: 'Deferred revenue', value: `₹${(cfg.products.filter(p => deferred.includes(p.id)).reduce((s, p) => s + p.priceInclGst * p.unitsPlanMonthly, 0) / 100000).toFixed(2)}L/mo`, health: 'alarm', detail: 'Scanner Pro, Research Subscription and Mentorship cannot lawfully launch on Day 1 — no named analyst, no Compliance Officer, no validation evidence.' },
+      { label: 'Deferred revenue', value: `₹${(deferredProducts.reduce((s, p) => s + p.priceInclGst * p.unitsPlanMonthly, 0) / 100000).toFixed(2)}L/mo`, health: deferredProducts.length ? 'alarm' : 'ok', detail: deferredProducts.length ? `${deferredProducts.map(p => p.short).join(', ')} are marked as not shipping on Day 1. Mark a product as shipping in Config once its acceptance gate passes.` : 'Every product on the ladder is marked as shipping on Day 1.' },
     ]
     out.push({
       def: DEPTS[2], health: worst(sig.map(s => s.health)),
-      headline: 'Roughly ₹10.25L/month of the plan cannot launch on Day 1',
+      headline: deferredProducts.length ? `₹${(deferredProducts.reduce((s, p) => s + p.priceInclGst * p.unitsPlanMonthly, 0) / 100000).toFixed(2)}L/month of the plan is not shipping on Day 1` : 'Every product is cleared to ship',
       signals: sig,
       action: 'Decide: hold Day 60 at ₹25L with research opening by ~Day 20, or re-base to ₹15–17L and move ₹25L to Day 85–95.',
       actionOwner: 'Founder', founderRequired: true,
