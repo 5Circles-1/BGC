@@ -1,7 +1,7 @@
-.DS_Store
-node_modules/
-*.log
-scratch/
 
+*.log
+.DS_Store
 app/dist/
 app/node_modules/
+node_modules/
+scratch/
