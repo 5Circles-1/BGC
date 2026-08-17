@@ -4,7 +4,7 @@ The operating system for the 60-day sprint to **₹25,00,000/month collections**
 
 ## The instrument: OPERATOR v2
 
-**Open [`portal/index.html`](portal/index.html) in any browser.** One self-contained file — no server, no install, works on the sales-floor phone. Fourteen modules: command center, quant engine (reverse solver / sensitivity / Monte Carlo), sales & lead engines, hiring & academy, compliance vault (fee-cap ledger, KYC gates, analyst sign-off), finance & cash, the daily ritual, the 31-agent console, and the weekly review. Manual: [`docs/OPERATOR.md`](docs/OPERATOR.md).
+**Open [`portal/index.html`](portal/index.html) in any browser.** It opens on the **Morning Brief** — the 08:45 artifact the 09:00 huddle runs on, with live ad numbers, the unworked-lead alarm, per-ad actions and per-rep coaching, copyable straight into WhatsApp. One self-contained file — no server, no install, works on the sales-floor phone. Fourteen modules: command center, quant engine (reverse solver / sensitivity / Monte Carlo), sales & lead engines, hiring & academy, compliance vault (fee-cap ledger, KYC gates, analyst sign-off), finance & cash, the daily ritual, the 31-agent console, and the weekly review. Manual: [`docs/OPERATOR.md`](docs/OPERATOR.md).
 
 First run: answer **Discovery** (the 16 questions the model needs), then confirm the restated one-pager. Until then OPERATOR runs on the brief's CEO defaults — every number editable in **Config**.
 
@@ -12,6 +12,7 @@ First run: answer **Discovery** (the 16 questions the model needs), then confirm
 |---|---|---|
 | 0 | **START HERE — the T-15 launch runway**: gates, roles, critical path, and the honest verdict on what can launch on Day 1 | [`docs/PRELAUNCH.md`](docs/PRELAUNCH.md) |
 | 0b | Product build + the back-testing protocol (thresholds published before results exist) | [`docs/PRODUCT-READINESS.md`](docs/PRODUCT-READINESS.md) |
+| 0c | **Live data feed** — how the dashboard fetches instead of asking, and how to refresh it | [`docs/DATA-FEED.md`](docs/DATA-FEED.md) |
 | 1 | **OPERATOR manual** — model in one page, the 14 modules, data rules | [`docs/OPERATOR.md`](docs/OPERATOR.md) |
 | 2 | App source (React/TS; `npm install && npm run build`) | [`app/`](app) |
 | 3 | Claude skills that carry the domain knowledge (compliance, sales playbook, creative pre-flight, war-room ritual, MIS formats) | [`.claude/skills/`](.claude/skills) |

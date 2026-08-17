@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react'
 import { Download, Upload, RotateCcw, Trash2 } from 'lucide-react'
 import { useStore } from '../state/store'
-import { Panel, Num, Text, Select, DataTable, useFlash, Pill } from '../components/ui'
+import { Panel, Num, Text, Select, DataTable, useFlash, Pill, Stat } from '../components/ui'
 import { inr, inrC } from '../lib/format'
 import { exportAll, importAll, wipeAll, downloadFile } from '../lib/storage'
 import { planRevenueMonthly } from '../model/engine'
+import { FIRST_PULL, applyFeed, feedTotals, type FeedSnapshot } from '../model/feed'
 
 export default function Config() {
   const { cfg, setCfg, resetConfig, mode, theme, setTheme } = useStore()
@@ -53,6 +54,8 @@ export default function Config() {
           Data lives in this browser only (no server, no PII). Team-shared state = one operator machine or a daily JSON backup passed to the war room. Everything numeric on this page recalculates the whole system live.
         </p>
       </Panel>
+
+      <LiveData />
 
       <Panel span={6} title="Entity (Discovery Q1–Q3 — confirm with CS & Compliance Officer)">
         <div className="stack">
@@ -197,5 +200,54 @@ export default function Config() {
         <p className="small dim" style={{ margin: '6px 0 0' }}>Cap default {inr(151000)} (effective 8 Jan 2025, CII-indexed, reviewed 3-yearly) — update here when SEBI revises it.</p>
       </Panel>
     </div>
+  )
+}
+
+function LiveData() {
+  const { cfg, data, setData } = useStore()
+  const [paste, setPaste] = useState('')
+  const [flash, setFlash] = useFlash()
+  const feed = data.feed
+  const totals = feed ? feedTotals(feed) : null
+
+  const load = (snap: FeedSnapshot) => {
+    const { data: next, result } = applyFeed({ ...data, feed: snap }, snap)
+    setData(() => ({ ...next, feed: snap }))
+    setFlash(result.notes.join(' '))
+  }
+
+  const importPasted = () => {
+    try {
+      const snap = JSON.parse(paste) as FeedSnapshot
+      if (!snap.ads || !snap.campaigns) { setFlash('Not a feed snapshot — needs "ads" and "campaigns" arrays.'); return }
+      load(snap); setPaste('')
+    } catch { setFlash('Could not parse that as JSON.') }
+  }
+
+  return (
+    <Panel span={12} title="Live data — the dashboard fetches, it does not ask">
+      <div className="row" style={{ gap: 26, marginBottom: 10 }}>
+        <Stat label="Feed status" value={feed ? 'connected' : 'not loaded'} tone={feed ? 'good' : undefined}
+          sub={feed ? `${feed.source} · pulled ${feed.pulledAt.slice(0, 16).replace('T', ' ')}` : 'load the first pull to see live ad numbers'} />
+        {totals && <Stat label="Live CPL" value={totals.cpl ? `₹${totals.cpl.toFixed(2)}` : '—'} tone={totals.cpl && totals.cpl <= cfg.funnel.cplBlended ? 'good' : undefined}
+          sub={`${totals.leads} customer leads from ${inr(Math.round(totals.spend))} · hiring counted separately`} />}
+        {totals && <Stat label="Brand spend (no lead path)" value={inrC(totals.brandSpend)} sub="LINK_CLICKS objective — clicks a closer cannot work" />}
+      </div>
+      <div className="row noprint">
+        <button className="btn primary" onClick={() => load(FIRST_PULL)}>Load the 10 Aug live pull</button>
+        <span className="small dim">Refreshing: ask a Claude session with the Meta connection to “refresh the OPERATOR feed”, then paste the JSON below. Format: <code>docs/DATA-FEED.md</code>.</span>
+      </div>
+      {flash && <div className="note good" style={{ marginTop: 8 }}>{flash}</div>}
+      <div style={{ marginTop: 10 }}>
+        <Text area label="Paste a feed snapshot (JSON)" value={paste} onChange={setPaste} placeholder='{"pulledAt":"…","source":"meta:ads-mcp","accounts":[…],"campaigns":[…],"ads":[…],"daily":[…]}' />
+        <div className="row" style={{ marginTop: 6 }}>
+          <button className="btn" disabled={!paste.trim()} onClick={importPasted}>Import snapshot</button>
+          {feed && <button className="btn danger" onClick={() => { setData(d => ({ ...d, feed: undefined })); setFlash('Feed cleared.') }}>Clear feed</button>}
+        </div>
+      </div>
+      <p className="small dim" style={{ margin: '8px 0 0' }}>
+        A snapshot with per-date rows back-fills the daily logs automatically, so spend and leads never get typed by hand. Locked days are never overwritten. Everything else in the EOD form — collections, dials, per-rep numbers — still comes from the floor until a dialler and gateway feed are wired.
+      </p>
+    </Panel>
   )
 }

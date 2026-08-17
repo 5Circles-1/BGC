@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import {
   Gauge, Sigma, IndianRupee, PhoneCall, Magnet, Megaphone, Users, GraduationCap,
   ShieldCheck, Landmark, PackageCheck, CalendarClock, Bot, ClipboardList, Settings2, CircleHelp,
-  Moon, Sun, Rocket,
+  Moon, Sun, Rocket, Sunrise,
 } from 'lucide-react'
 import { useStore } from './state/store'
 import { todayISO, inrC, pct, diffDays } from './lib/format'
@@ -26,8 +26,10 @@ import M14 from './modules/M14WBR'
 import Config from './modules/Config'
 import Discovery from './modules/Discovery'
 import M00 from './modules/M00Readiness'
+import M15 from './modules/M15Brief'
 
 const NAV: { id: string; label: string; k: string; icon: React.ComponentType<{ size?: number }>; group?: string }[] = [
+  { id: 'm15', label: 'Morning Brief', k: '08:45', icon: Sunrise },
   { id: 'm0', label: 'Launch Readiness', k: 'M0', icon: Rocket },
   { id: 'm1', label: 'Command Center', k: 'M1', icon: Gauge },
   { id: 'm2', label: 'Quant Engine', k: 'M2', icon: Sigma },
@@ -122,6 +124,7 @@ export default function App() {
         </header>
 
         <main className="content">
+          {view === 'm15' && <M15 />}
           {view === 'm0' && <M00 />}
           {view === 'm1' && <M01 go={go} />}
           {view === 'm2' && <M02 />}

@@ -91,6 +91,8 @@ export interface DailyLog {
   units: Partial<Record<ProductId, number>>
   collections: Partial<Record<ProductId, number>>   // ₹ received (basis: gross incl. GST)
   leadsIn: number
+  /** Leads actually dispositioned. leadsIn − leadsWorked is the backlog that killed July. */
+  leadsWorked?: number
   leadsBySource: Record<string, number>
   spend: Record<string, number>
   dials: number; connects: number; quals: number
@@ -236,5 +238,7 @@ export interface AppData {
   wbr: Record<string, WeeklyReview>
   discovery: Discovery
   readiness: Readiness
+  /** Latest imported live-data snapshot (see model/feed.ts). */
+  feed?: import('./feed').FeedSnapshot
   auditTrail: { at: string; what: string }[]
 }
